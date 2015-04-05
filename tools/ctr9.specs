@@ -1,0 +1,7 @@
+%rename link                old_link
+
+*link:
+%(old_link) -T %:getenv(DEVKITPRO /ctr9/tools/ctr9.ld)%s
+
+*startfile:
+%:getenv(DEVKITPRO /ctr9/tools/ctr9_crt0%O%s)

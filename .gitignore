@@ -1,0 +1,5 @@
+.idea
+bin
+lib
+CMakeLists.txt
+*.tar.bz2
