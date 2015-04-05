@@ -1,5 +1,6 @@
 #include "ctr9/fs.h"
 
+// TODO: Port to multiple FIRM versions.
 #define FILE_OPEN 0x0805CF05
 #define FILE_CLOSE 0x0805CFC5
 #define FILE_READ 0x0804E315

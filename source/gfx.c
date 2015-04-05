@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+// TODO: Check for consistency across FIRM versions.
 #define FB_TOP_LEFT1 0x20184E60
 #define FB_TOP_LEFT2 0x201CB370
 #define FB_TOP_RIGHT1 0x20282160

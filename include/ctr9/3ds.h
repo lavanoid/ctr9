@@ -9,7 +9,6 @@
 #include "types.h"
 #include "svc.h"
 
-void hang();
 void reboot();
 void powerOff();
 
