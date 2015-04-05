@@ -94,11 +94,7 @@ u32 ntrcardWriteAndRead(const u8* command, u32 flags) {
     return ntrcardRead(flags);
 }
 
-u32 ntrcardReadID(u32 flags) {
-    return ntrcardWriteAndRead((u8[8]) {0, 0, 0, 0, 0, 0, 0, NTRCARD_CMD_HEADER_CHIPID}, flags);
-}
-
-void ntrcardReadHeader(u8* header) {
+void ntrcardReset() {
     NTRCARD_ROMCNT = 0;
     NTRCARD_MCNT = 0;
 
@@ -106,13 +102,6 @@ void ntrcardReadHeader(u8* header) {
     NTRCARD_ROMCNT = NTRCARD_ROMCNT_nRESET | NTRCARD_ROMCNT_SEC_SEED;
     while(NTRCARD_ROMCNT & NTRCARD_ROMCNT_BUSY);
 
-    ntrcardReset();
-    while(NTRCARD_ROMCNT & NTRCARD_ROMCNT_BUSY);
-
-    ntrcardParamCommand(NTRCARD_CMD_HEADER_READ, 0, (u32) (NTRCARD_ROMCNT_BUSY | NTRCARD_ROMCNT_nRESET | NTRCARD_ROMCNT_CLK_SLOW | NTRCARD_ROMCNT_BLK_SIZE(1) | NTRCARD_ROMCNT_DELAY1(0x1FFF) | NTRCARD_ROMCNT_DELAY2(0x3F)), (u32*) header, 512 / 4);
-}
-
-void ntrcardReset() {
     ntrcardWriteCommand((u8[8]) {0, 0, 0, 0, 0, 0, 0, NTRCARD_CMD_DUMMY});
     NTRCARD_ROMCNT = (u32) (NTRCARD_ROMCNT_BUSY | NTRCARD_ROMCNT_nRESET | NTRCARD_ROMCNT_CLK_SLOW | NTRCARD_ROMCNT_BLK_SIZE(5) | NTRCARD_ROMCNT_DELAY2(0x18));
 
@@ -126,6 +115,15 @@ void ntrcardReset() {
             }
         }
     } while(NTRCARD_ROMCNT & NTRCARD_ROMCNT_BUSY);
+}
+
+void ntrcardReadHeader(u8* header) {
+    ntrcardReset();
+    ntrcardParamCommand(NTRCARD_CMD_HEADER_READ, 0, (u32) (NTRCARD_ROMCNT_BUSY | NTRCARD_ROMCNT_nRESET | NTRCARD_ROMCNT_CLK_SLOW | NTRCARD_ROMCNT_BLK_SIZE(1) | NTRCARD_ROMCNT_DELAY1(0x1FFF) | NTRCARD_ROMCNT_DELAY2(0x3F)), (u32*) header, 512 / 4);
+}
+
+u32 ntrcardReadID(u32 flags) {
+    return ntrcardWriteAndRead((u8[8]) {0, 0, 0, 0, 0, 0, 0, NTRCARD_CMD_HEADER_CHIPID}, flags);
 }
 
 void ntrcardEepromWaitBusy() {

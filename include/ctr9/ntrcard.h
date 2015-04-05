@@ -9,9 +9,9 @@ void ntrcardParamCommand(u8 command, u32 parameter, u32 flags, u32 *destination,
 u32 ntrcardRead(u32 flags);
 u32 ntrcardWriteAndRead(const u8 *command, u32 flags);
 
-u32 ntrcardReadID(u32 flags);
-void ntrcardReadHeader(u8 *header);
 void ntrcardReset();
+void ntrcardReadHeader(u8 *header);
+u32 ntrcardReadID(u32 flags);
 
 u8 ntrcardEepromCommand(u8 command);
 u32 ntrcardEepromReadID();
