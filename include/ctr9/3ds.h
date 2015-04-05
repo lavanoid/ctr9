@@ -6,6 +6,7 @@
 #include "hid.h"
 #include "i2c.h"
 #include "ntrcard.h"
+#include "spi.h"
 #include "types.h"
 #include "svc.h"
 
