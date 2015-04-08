@@ -1,47 +1,58 @@
+#include <fatfs/sdmmc.h>
 #include "ctr9/fs.h"
 
-// TODO: Port to multiple FIRM versions.
-#define FILE_OPEN 0x0805CF05
-#define FILE_CLOSE 0x0805CFC5
-#define FILE_READ 0x0804E315
-#define FILE_WRITE 0x0805E181
-#define FILE_GET_SIZE 0x0805DEF5
+#include "fatfs/ff.h"
 
-u32 __attribute__((naked)) fileOpen(void* handle, const u16* name, u32 mode) {
-    asm volatile("push {r4, lr} \t\n"
-            "ldr r4, =%0   \t\n"
-            "blx r4        \t\n"
-            "pop {r4, pc}  \t\n" : : "i"(FILE_OPEN));
+static FATFS fs;
+
+FSResult fsInit() {
+    return (FSResult) f_mount(&fs, "0:", 0);
 }
 
-void __attribute__((naked)) fileClose(void* handle) {
-    asm volatile("push {r4, lr} \t\n"
-            "ldr r4, =%0   \t\n"
-            "blx r4        \t\n"
-            "pop {r4, pc}  \t\n" : : "i"(FILE_CLOSE));
+FSResult fsExit() {
+    return (FSResult) f_mount(NULL, "0:", 0);
 }
 
-void __attribute__((naked)) fileRead(void* handle, u32* bytesRead, void* buf, u32 size) {
-    asm volatile("push {r4, lr} \t\n"
-            "ldr r4, =%0   \t\n"
-            "blx r4        \t\n"
-            "pop {r4, pc}  \t\n" : : "i"(FILE_READ));
+FSResult fsOpen(FileHandle* handle, const char* path, u8 flags) {
+    FSResult result = (FSResult) f_open((FIL*) handle, path, flags);
+    if(result == FS_OK) {
+        f_lseek((FIL*) handle, 0);
+        f_sync((FIL*) handle);
+    }
+
+    return result;
 }
 
-void __attribute__((naked)) fileWrite(void* handle, u32* bytesWritten, void* buf, u32 size) {
-    asm volatile("push {r4, lr}     \t\n"
-            "sub sp, sp, #4    \t\n"
-            "ldr r4, [sp, #12] \t\n"
-            "str r4, [sp, #0]  \t\n"
-            "ldr r4, =%0       \t\n"
-            "blx r4            \t\n"
-            "add sp, sp, #4    \t\n"
-            "pop {r4, pc}      \t\n" : : "i"(FILE_WRITE));
+FSResult fsClose(FileHandle* handle) {
+    return (FSResult) f_close((FIL*) handle);
 }
 
-void __attribute__((naked)) fileGetSize(void* handle, u32* size) {
-    asm volatile("push {r4, lr} \t\n"
-            "ldr r4, =%0   \t\n"
-            "blx r4        \t\n"
-            "pop {r4, pc}  \t\n" : : "i"(FILE_GET_SIZE));
+FSResult fsGetSize(FileHandle* handle, u32 *size) {
+    *size = (u32) f_size((FIL*) handle);
+    return FS_OK;
+}
+
+FSResult fsSeek(FileHandle* handle, u32 offset) {
+    return (FSResult) f_lseek((FIL*) handle, offset);
+}
+
+FSResult fsRead(FileHandle* handle, u32* bytesRead, void* buf, u32 size) {
+    return (FSResult) f_read((FIL*) handle, buf, size, (UINT*) bytesRead);
+}
+
+FSResult fsWrite(FileHandle* handle, u32* bytesWritten, void* buf, u32 size) {
+    FSResult result = (FSResult) f_write((FIL*) handle, buf, size, (UINT*) bytesWritten);
+    if(result == FS_OK) {
+        f_sync((FIL*) handle);
+    }
+
+    return result;
+}
+
+void fsReadNANDSectors(u32 sector, u32 sectors, void* buf) {
+    sdmmc_nand_readsectors(sector, sectors, buf);
+}
+
+void fsWriteNANDSectors(u32 sector, u32 sectors, void* buf) {
+    sdmmc_nand_writesectors(sector, sectors, buf);
 }

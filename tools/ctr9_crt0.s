@@ -10,6 +10,4 @@ _start:
 .pool
 
 loop:
-    ldr r0, =0xFFFFFFFF
-    svc 0x0A
     b loop

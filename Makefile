@@ -13,9 +13,11 @@ SOURCES := source
 INCLUDES := include
 BUILD_FLAGS := -Wall -Os -fomit-frame-pointer -ffast-math
 
-CFILES := $(foreach dir,$(SOURCES),$(wildcard $(dir)/*.c))
-CPPFILES := $(foreach dir,$(SOURCES),$(wildcard $(dir)/*.cpp))
-SFILES := $(foreach dir,$(SOURCES),$(wildcard $(dir)/*.S))
+recurse = $(shell find $2 -type $1 -name '$3' 2> /dev/null)
+
+CFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.c))
+CPPFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.cpp))
+SFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.S))
 OBJS := $(addprefix $(BUILD_DIR)/,$(CFILES:.c=.o)) $(addprefix $(BUILD_DIR)/,$(CPPFILES:.cpp=.o)) $(addprefix $(BUILD_DIR)/,$(SFILES:.S=.o))
 
 DEVKITARM_BIN := $(DEVKITARM)/bin
@@ -46,27 +48,22 @@ ctr9.tar.bz2: all
 	@echo $@
 	@tar -cjf ctr9.tar.bz2 $(INCLUDES) $(OUTPUT_DIR) $(TOOLS_DIR)
 
-$(BUILD_DIR):
-	@mkdir -p $@
-
-$(BUILD_DIR)/$(SOURCES):
-	@mkdir -p $@
-
-$(OUTPUT_DIR):
-	@mkdir -p $@
-
-$(OUTPUT_DIR)/libctr9.a: $(OBJS) $(OUTPUT_DIR)
+$(OUTPUT_DIR)/libctr9.a: $(OBJS)
 	@echo $@
+	@mkdir -p $(dir $@)
 	@$(AR) -rcs $@ $(OBJS)
 
-$(BUILD_DIR)/%.o: %.c $(BUILD_DIR)/$(SOURCES)
+$(BUILD_DIR)/%.o: %.c
 	@echo $@
+	@mkdir -p $(dir $@)
 	@$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: %.cpp $(BUILD_DIR)/$(SOURCES)
+$(BUILD_DIR)/%.o: %.cpp
 	@echo $@
+	@mkdir -p $(dir $@)
 	@$(CPP) $(CPPFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: %.S $(BUILD_DIR)/$(SOURCES)
+$(BUILD_DIR)/%.o: %.S
 	@echo $@
+	@mkdir -p $(dir $@)
 	@$(CC) $(SFLAGS) -c $< -o $@

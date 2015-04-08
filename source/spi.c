@@ -2,8 +2,6 @@
 
 #include <string.h>
 
-#define IRQ_IE (*(vu32*) 0x10001000)
-
 #define SPI_CNT0 (*(vu16*) 0x10142000)
 #define SPI_DATA0 (*(vu8*) 0x10142002)
 
@@ -29,9 +27,6 @@ u8 spiReadWrite(u8 data) {
 }
 
 void spiReadNTRFirmware(u32 address, void* destination, u32 size) {
-    u32 oldIE = IRQ_IE;
-    IRQ_IE = 0;
-
     u8* buffer = destination;
 
     SPI_CNT0 = SPI_ENABLE | SPI_CONTINUOUS | SPI_DEVICE_FIRMWARE;
@@ -45,8 +40,6 @@ void spiReadNTRFirmware(u32 address, void* destination, u32 size) {
     }
 
     SPI_CNT0 = 0;
-
-    IRQ_IE = oldIE;
 }
 
 bool spiWriteNTRFirmwarePage(u32 address, u8* buffer) {
@@ -56,9 +49,6 @@ bool spiWriteNTRFirmwarePage(u32 address, u8* buffer) {
     if(memcmp(pagebuffer, buffer, 256) == 0) {
         return true;
     }
-
-    u32 oldIE = IRQ_IE;
-    IRQ_IE = 0;
 
     SPI_CNT0 = SPI_ENABLE | SPI_CONTINUOUS | SPI_DEVICE_FIRMWARE;
     spiReadWrite(FIRMWARE_WREN);
@@ -84,8 +74,6 @@ bool spiWriteNTRFirmwarePage(u32 address, u8* buffer) {
     spiReadWrite(FIRMWARE_RDSR);
     while(spiReadWrite(0) & 0x01);
     SPI_CNT0 = 0;
-
-    IRQ_IE = oldIE;
 
     spiReadNTRFirmware(address, pagebuffer, 256);
     return memcmp(pagebuffer, buffer, 256) == 0;

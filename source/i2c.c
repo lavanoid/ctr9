@@ -1,8 +1,5 @@
 #include "ctr9/i2c.h"
 
-#define I2C_DATA 0
-#define I2C_CNT 1
-
 #define I2C_CNT_STOP BIT(0)
 #define I2C_CNT_START BIT(1)
 #define I2C_CNT_PAUSE BIT(2)
@@ -11,43 +8,35 @@
 #define I2C_CNT_IRQ BIT(6)
 #define I2C_CNT_BUSY BIT(7)
 
-static u32 bus[] = {
-        0x10161000,
-        0x10144000,
-        0x10148000,
-};
+#define I2C_DATA(device) *((vu8*) (device.bus + 0))
+#define I2C_CNT(device) *((vu8*) (device.bus + 1))
 
-vu8* i2cGetDataReg(I2CDevice device) {
-    return (vu8*) (bus[device.bus] + I2C_DATA);
-}
+static u32 i2cDelay = 0;
 
-vu8* i2cGetCntReg(I2CDevice device) {
-    return (vu8*) (bus[device.bus] + I2C_CNT);
-}
-
-inline void i2cWaitBusy(I2CDevice device) {
-    while(*i2cGetCntReg(device) & 0x80);
+void i2cWaitBusy(I2CDevice device) {
+    while(I2C_CNT(device) & 0x80);
+    for(u32 delay = i2cDelay; delay != 0; delay--) {
+        asm volatile("");
+    }
 }
 
 u8 i2cRead(I2CDevice device) {
+    I2C_CNT(device) = I2C_CNT_BUSY | I2C_CNT_IRQ | I2C_CNT_READ;
     i2cWaitBusy(device);
-    *i2cGetCntReg(device) = I2C_CNT_BUSY | I2C_CNT_IRQ | I2C_CNT_READ;
-    i2cWaitBusy(device);
-    return *i2cGetDataReg(device);
+    return I2C_DATA(device);
 }
 
 bool i2cWrite(I2CDevice device, u8 data, u8 extraFlags) {
+    I2C_DATA(device) = data;
+    I2C_CNT(device) = (u8) (I2C_CNT_BUSY | I2C_CNT_IRQ | extraFlags);
     i2cWaitBusy(device);
-    *i2cGetDataReg(device) = data;
-    *i2cGetCntReg(device) = (u8) (I2C_CNT_BUSY | I2C_CNT_IRQ | extraFlags);
-    i2cWaitBusy(device);
-    return (bool) (*i2cGetCntReg(device) & I2C_CNT_ACK);
+    return (bool) (I2C_CNT(device) & I2C_CNT_ACK);
 }
 
 void i2cStop(I2CDevice device) {
+    I2C_CNT(device) = I2C_CNT_BUSY | I2C_CNT_IRQ | I2C_CNT_PAUSE | I2C_CNT_STOP;
     i2cWaitBusy(device);
-    *i2cGetCntReg(device) = I2C_CNT_BUSY | I2C_CNT_IRQ | I2C_CNT_PAUSE | I2C_CNT_STOP;
-    i2cWaitBusy(device);
+    i2cDelay = 0;
 }
 
 bool i2cStart(I2CDevice device, I2CRegister reg, bool read) {
@@ -66,6 +55,12 @@ bool i2cStart(I2CDevice device, I2CRegister reg, bool read) {
             i2cStop(device);
             return false;
         }
+    }
+
+    if(device.bus == DEVICE_MCU.bus && device.address == DEVICE_MCU.address) {
+        i2cDelay = 0x180;
+    } else {
+        i2cDelay = 0;
     }
 
     return true;
