@@ -1,6 +1,10 @@
 #ifndef __NTRCARD_H__
 #define __NTRCARD_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 void ntrcardWriteCommand(const u8 *command);
@@ -21,5 +25,9 @@ void ntrcardEepromRead(u32 address, u8 *data, u32 length, u32 addrtype);
 void ntrcardEepromWrite(u32 address, u8 *data, u32 length, u32 addrtype);
 void ntrcardEepromChipErase();
 void ntrcardEepromSectorErase(u32 address);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

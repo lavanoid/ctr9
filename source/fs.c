@@ -1,7 +1,7 @@
-#include <fatfs/sdmmc.h>
 #include "ctr9/fs.h"
 
 #include "fatfs/ff.h"
+#include "fatfs/sdmmc.h"
 
 static FATFS fs;
 
@@ -54,5 +54,6 @@ void fsReadNANDSectors(u32 sector, u32 sectors, void* buf) {
 }
 
 void fsWriteNANDSectors(u32 sector, u32 sectors, void* buf) {
-    sdmmc_nand_writesectors(sector, sectors, buf);
+    // TODO: sdmmc_nand_writesectors is not implemented yet.
+    //sdmmc_nand_writesectors(sector, sectors, buf);
 }

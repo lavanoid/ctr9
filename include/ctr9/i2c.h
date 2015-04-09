@@ -1,6 +1,10 @@
 #ifndef __I2C_H__
 #define __I2C_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 typedef struct {
@@ -37,5 +41,9 @@ typedef enum {
 
 u8 i2cReadRegister(I2CDevice device, I2CRegister reg);
 bool i2cWriteRegister(I2CDevice device, I2CRegister reg, u8 data);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

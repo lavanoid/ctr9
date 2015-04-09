@@ -1,6 +1,10 @@
 #ifndef __GFX_H__
 #define __GFX_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 typedef enum {
@@ -15,5 +19,9 @@ void gfxClearScreens(u8 color);
 void gfxDrawChar(Screen screen, char c, int x, int y);
 void gfxDrawString(Screen screen, const char* str, int x, int y);
 void gfxPrintString(const char* str);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

@@ -19,6 +19,7 @@ CFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.c))
 CPPFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.cpp))
 SFILES := $(foreach dir,$(SOURCES),$(call recurse,f,$(dir),*.S))
 OBJS := $(addprefix $(BUILD_DIR)/,$(CFILES:.c=.o)) $(addprefix $(BUILD_DIR)/,$(CPPFILES:.cpp=.o)) $(addprefix $(BUILD_DIR)/,$(SFILES:.S=.o))
+INCLUDE := $(foreach dir,$(INCLUDES),-I$(dir)) $(foreach dir,$(SOURCES),-I$(dir))
 
 DEVKITARM_BIN := $(DEVKITARM)/bin
 PREFIX := $(DEVKITARM_BIN)/arm-none-eabi-

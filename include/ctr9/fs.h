@@ -1,6 +1,10 @@
 #ifndef __FS_H__
 #define __FS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 #define OPEN_READ 0x01
@@ -44,5 +48,9 @@ FSResult fsWrite(FileHandle* handle, u32* bytesWritten, void* buf, u32 size);
 
 void fsReadNANDSectors(u32 sector, u32 sectors, void* buf);
 void fsWriteNANDSectors(u32 sector, u32 sectors, void* buf);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif

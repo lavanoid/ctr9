@@ -1,6 +1,10 @@
 #ifndef __3DS_H__
 #define __3DS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "fs.h"
 #include "gfx.h"
 #include "hid.h"
@@ -12,5 +16,9 @@
 
 void reboot();
 void powerOff();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

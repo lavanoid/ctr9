@@ -1,6 +1,10 @@
 #ifndef __HID_H__
 #define __HID_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "types.h"
 
 typedef enum {
@@ -22,5 +26,9 @@ void hidScanInput();
 bool hidIsHeld(Button button);
 bool hidIsPressed(Button button);
 bool hidIsReleased(Button button);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif
