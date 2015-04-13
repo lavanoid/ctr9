@@ -1,4 +1,4 @@
-<b><center><h1>ctr9</h></center></b>
+<b><center>ctr9</center></b>
 ==========
 
 Library for running code on the 3DS's ARM9 processor.

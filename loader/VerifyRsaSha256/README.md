@@ -1,4 +1,4 @@
-<b><center><h1>VerifyRsaSha256 Loader</h></center></b>
+<b><center>VerifyRsaSha256 Loader</center></b>
 ==========
 
 Loads "arm9.bin" into the appropriate address for ctr9 binaries and jumps to it, using the 4.x VerifyRsaSha256 exploit to gain code execution.

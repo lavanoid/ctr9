@@ -1,4 +1,4 @@
-<b><center><h1>Hello World</h></center></b>
+<b><center>Hello World</center></b>
 ==========
 
 Simple "Hello World" example using ctr9.
